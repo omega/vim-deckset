@@ -9,9 +9,10 @@ on run argv
                     set seen to doc
                 end if
             end repeat
-            if seen is false then
-                set seen to open fp as POSIX file
-            end if
+            # If we do this, we open a dockset document for every markdown file we edit..
+            #if seen is false then
+            #    set seen to open fp as POSIX file
+            #end if
             if seen is not false then
                 set position of seen to pos
             end if

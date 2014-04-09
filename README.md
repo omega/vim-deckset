@@ -7,6 +7,6 @@ contents of the preview window as you move around in your presentation md file.
 
 ## Note
 
-This is just a quick first stab at implementing this. It is by no means
-complete yet, and does not currently support more than one presentation at
-a time etc.
+This is by no means complete. It is currently enabled for all markdown files,
+and the osascript call happens for all files, so depending on the speed of that
+it might anoy you. It doesn't anoy me yet.
