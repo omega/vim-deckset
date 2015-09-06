@@ -44,7 +44,30 @@ safety steps.
 - If these conditions are met, your Vim filetype is set to ‘deckset’. 
 - Apart from the syntax highlighting files, this plugin should be run out of the `.vim/after` folders, so that it makes sure to pick up and set the ‘deckset’ filetype without it later being overridden by other Markdown detectors (assuming those aren't _also_ loaded in `after`).
     
-In addition, there's an enhanced Vim syntax file based on [jratner/vim-flavored-markdown](https://github.com/jtratner/vim-flavored-markdown), which adds more Deckset awareness on top of Github Flavored Markdown support.
+In addition, there's an enhanced Vim syntax file based on
+[tpope/vim-markdown](https://github.com/tpope/vim-markdown), which attempts
+to specifically support all of the Deckset Markdown, including LaTeX
+recognition inside formula blocks (If you have the optional Formula plugin
+for Deckset).
+
+Brilliantly, Tim Pop's Markdown code supports replacing the code inside of
+fenced code blocks (bounded by <pre>```[languageName]\n[code]\n```</pre>) with
+proper Syntax highlighting (it seems the sub-highlighting only shows up on
+_some_ colorschemes). This works only for languages set in the global
+setting (placed in your `~/.vimrc`) `g:markdown_fenced_languages`. To add
+support for Scala code highlighting, add the following:
+
+```vim
+let g:markdown_fenced_languages = ["scala"]
+```
+
+It is an array, so you can add many languages. I've preserved the same
+variable name as Tim Pope's Markdown as there's no conflict, so you only need
+one global setting for both Tim Pope's markdown and deckset-markdown.
+
+Additonally, as long as you have a `tex` syntax highlighting plugin in your
+Vim setup, Deckset formulas will syntax highlight similarly-you do not need to
+add `tex` to the `g:markdown_fenced_languages` setting.
     
 I've seen issues with terminal based Vim acting odd & glitchy when the plugin is activated. As a result, by default I have the plugin set to only execute only when the GUI mode (aka MacVim) is running. If you'd like to change it you can set the following in your `.vimrc` file:
 

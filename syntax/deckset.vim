@@ -1,17 +1,18 @@
 " Vim syntax file
 " Language: Deckset Flavored Markdown
-" Based upon Github Flavored Markdown, which is based on Tim Pope's Markdown
+" Based upon Tim Pope's Markdown
 " 
-" GFM Maintainer: Jeff Tratner <github.com/jtratner>
-" Tim Pop Markdown Maintainer: Tim Pope <vimNOSPAM@tpope.org>
+" Maintainer: Brendan McAdams <brendan@evilmonkeylabs.com>
+" Tim Pope Markdown Maintainer: Tim Pope <vimNOSPAM@tpope.org>
 "
 " Filenames: None automatically triggered. 
 "            Only used if the Deckset plugin 
 "            sets filetype = deckset
 "
-" (nearly the same as jratner's Github Flavored Markdown,
-"  with some additions for things Deckset supports, and some
-"  attempts at weird hacks)
+" attempts to specifically support all of the Deckset subset of Markdown, 
+" including LaTeX recognition inside formula blocks 
+" (If you have the optional Formula plugin for Deckset)
+ 
 
 if exists("b:current_syntax")
   finish
@@ -24,16 +25,31 @@ endif
 runtime! syntax/html.vim
 unlet! b:current_syntax
 
+if !exists('g:markdown_fenced_languages')
+  let g:markdown_fenced_languages = []
+endif
+for s:type in map(copy(g:markdown_fenced_languages),'matchstr(v:val,"[^=]*$")')
+  if s:type =~ '\.'
+    let b:{matchstr(s:type,'[^.]*')}_subtype = matchstr(s:type,'\.\zs.*')
+  endif
+  exe 'syn include @markdownHighlight'.substitute(s:type,'\.','','g').' syntax/'.matchstr(s:type,'[^.]*').'.vim'
+  unlet! b:current_syntax
+endfor
+unlet! s:type
+
+exe 'syn include @dsFormulaHighlight'.substitute('tex','\.','','g').' syntax/'.matchstr('tex','[^.]*').'.vim'
+
+
 syn sync minlines=10
 syn case ignore
 
 syn match markdownValid '[<>]\c[a-z/$!]\@!'
 syn match markdownValid '&\%(#\=\w*;\)\@!'
 
-syn match markdownLineStart "^[<@]\@!" nextgroup=@markdownBlock,htmlSpecialChar,decksetPragma
+syn match markdownLineStart "^[<@]\@!" nextgroup=@markdownBlock,htmlSpecialChar
 
 syn cluster decksetPragma contains=dsFooter,dsSlideNumbers,dsAutoscale,dsBuildLists
-syn cluster markdownBlock contains=markdownH1,markdownH2,markdownH3,markdownH4,markdownH5,markdownH6,markdownBlockquote,markdownListMarker,markdownOrderedListMarker,markdownCodeBlock,markdownRule,markdownGHCodeBlock
+syn cluster markdownBlock contains=markdownH1,markdownH2,markdownH3,markdownH4,markdownH5,markdownH6,markdownBlockquote,markdownListMarker,markdownOrderedListMarker,markdownCodeBlock,markdownRule,dsFormulaBlock
 syn cluster markdownInline contains=markdownLineBreak,markdownLinkText,markdownItalic,markdownBold,markdownCode,markdownEscape,@htmlTop,markdownError
 
 syn match markdownH1 "^.\+\n=\+$" contained contains=@markdownInline,markdownHeadingRule
@@ -52,17 +68,6 @@ syn match markdownBlockquote ">\%(\s\|$\)" contained nextgroup=@markdownBlock
 
 syn region markdownCodeBlock start="    \|\t" end="$" contained
 
-" TODO - strikeout support
-syn cluster validFooterText contains=markdownLinkText,markdownItalic,markdownBold,markdownCode,markdownEscape
-" TODO - make sure no blank lines between pragma statements
-syn match dsFooter "^footer:\s*" oneline keepend contains=@validFooterText
-
-" TODO - Only true/false allowed on the following
-syn keyword dsPragmaBoolean true false
-syn match dsSlideNumbers "^slidenumbers:\s*" oneline nextgroup=@dsPragmaBoolean
-syn match dsAutoscale "^autoscale:\s*" oneline nextgroup=@dsPragmaBoolean
-syn match dsBuildLists "^build-lists:\s*" oneline nextgroup=@dsPragmaBoolean
-
 " TODO: real nesting
 syn match markdownListMarker "\%(\t\| \{0,4\}\)[-*+]\%(\s\+\S\)\@=" contained
 syn match markdownOrderedListMarker "\%(\t\| \{0,4}\)\<\d\+\.\%(\s\+\S\)\@=" contained
@@ -79,26 +84,56 @@ syn region markdownUrlTitle matchgroup=markdownUrlTitleDelimiter start=+"+ end=+
 syn region markdownUrlTitle matchgroup=markdownUrlTitleDelimiter start=+'+ end=+'+ keepend contained
 syn region markdownUrlTitle matchgroup=markdownUrlTitleDelimiter start=+(+ end=+)+ keepend contained
 
-syn region markdownLinkText matchgroup=markdownLinkTextDelimiter start="!\=\[\%(\_[^]]*]\%( \=[[(]\)\)\@=" end="\]\%( \=[[(]\)\@=" keepend nextgroup=markdownLink,markdownId skipwhite contains=@markdownInline,markdownLineStart
+syn region markdownLinkText matchgroup=markdownLinkTextDelimiter start="!\=\[\%(\_[^]]*]\%( \=[[(]\)\)\@=" end="\]\%( \=[[(]\)\@=" nextgroup=markdownLink,markdownId skipwhite contains=@markdownInline,markdownLineStart
 syn region markdownLink matchgroup=markdownLinkDelimiter start="(" end=")" contains=markdownUrl keepend contained
 syn region markdownId matchgroup=markdownIdDelimiter start="\[" end="\]" keepend contained
 
-syn region markdownItalic start="\<\*\|\*\>" end="\<\*\|\*\>" keepend contains=markdownLineStart
-syn region markdownItalic start="\<_\|_\>" end="\<_\|_\>" keepend contains=markdownLineStart
-syn region markdownBold start="\<\*\*\|\*\*\>" end="\<\*\*\|\*\*\>" keepend contains=markdownLineStart,markdownItalic
-syn region markdownBold start="\<__\|__\>" end="\<__\|__\>" keepend contains=markdownLineStart,markdownItalic
-syn region markdownBoldItalic start="\<\*\*\*\|\*\*\*\>" end="\<\*\*\*\|\*\*\*\>" keepend contains=markdownLineStart
-syn region markdownBoldItalic start="\<___\|___\>" end="\<___\|___\>" keepend contains=markdownLineStart
+let s:concealends = has('conceal') ? ' concealends' : ''
+exe 'syn region markdownItalic matchgroup=markdownItalicDelimiter start="\S\@<=\*\|\*\S\@=" end="\S\@<=\*\|\*\S\@=" keepend contains=markdownLineStart' . s:concealends
+exe 'syn region markdownItalic matchgroup=markdownItalicDelimiter start="\S\@<=_\|_\S\@=" end="\S\@<=_\|_\S\@=" keepend contains=markdownLineStart' . s:concealends
+exe 'syn region markdownBold matchgroup=markdownBoldDelimiter start="\S\@<=\*\*\|\*\*\S\@=" end="\S\@<=\*\*\|\*\*\S\@=" keepend contains=markdownLineStart,markdownItalic' . s:concealends
+exe 'syn region markdownBold matchgroup=markdownBoldDelimiter start="\S\@<=__\|__\S\@=" end="\S\@<=__\|__\S\@=" keepend contains=markdownLineStart,markdownItalic' . s:concealends
+exe 'syn region markdownBoldItalic matchgroup=markdownBoldItalicDelimiter start="\S\@<=\*\*\*\|\*\*\*\S\@=" end="\S\@<=\*\*\*\|\*\*\*\S\@=" keepend contains=markdownLineStart' . s:concealends
+exe 'syn region markdownBoldItalic matchgroup=markdownBoldItalicDelimiter start="\S\@<=___\|___\S\@=" end="\S\@<=___\|___\S\@=" keepend contains=markdownLineStart' . s:concealends
+
 syn region markdownCode matchgroup=markdownCodeDelimiter start="`" end="`" keepend contains=markdownLineStart
 syn region markdownCode matchgroup=markdownCodeDelimiter start="`` \=" end=" \=``" keepend contains=markdownLineStart
-syn region markdownGHCodeBlock matchgroup=markdownCodeDelimiter start="^\s*$\n\s*```\s\?\S*\s*$" end="\s*```$\n\s*\n" contained  keepend
+syn region markdownCode matchgroup=markdownCodeDelimiter start="^\s*```.*$" end="^\s*```\ze\s*$" keepend
 
-syn match markdownEscape "\\[][\\`*_{}()#+.!-]"
+syn region dsFormulaBlock matchgroup=dsFormulaDelimiter start="^\s*\$\$.*$" end="^\s*\$\$\ze\s*\n" keepend
 
-" Copying rst's method of using literal strings
-hi def link markdownGHCodeBlock           String
-hi def link markdownCodeBlock             String
-hi def link markdownCode                  String
+syn region dsFormula matchgroup=dsFormulaDelimiter start="\$\$" end="\$\$" keepend contains=markdownLineStart keepend contains=markdownLineStart
+
+syn match markdownFootnote "\[^[^\]]\+\]"
+syn match markdownFootnoteDefinition "^\[^[^\]]\+\]:"
+
+if main_syntax ==# 'deckset'
+  for s:type in g:markdown_fenced_languages
+    " TODO - highlight specially the language name
+    exe 'syn region markdownHighlight'.substitute(matchstr(s:type,'[^=]*$'),'\..*','','').' matchgroup=markdownCodeDelimiter start="^\s*```\s*'.matchstr(s:type,'[^=]*').'\>.*$" end="^\s*```\ze\s*$" keepend contains=@markdownHighlight'.substitute(matchstr(s:type,'[^=]*$'),'\.','','g')
+  endfor
+  unlet! s:type
+endif
+
+exe 'syn region dsFormulaHighlight'.substitute(matchstr('tex','[^=]*$'),'\..*','','').' matchgroup=dsFormulaDelimiter start="^\s*\$\$\s*'.matchstr('tex','[^=]*').'\>.*$" end="^\s*\$\$\ze\s*$" keepend contains=@dsFormulaHighlight'.substitute(matchstr('tex','[^=]*$'),'\.','','g')
+
+syn match markdownEscape "\\[][\\`*_{}()<>#+.!-]"
+syn match markdownError "\w\@<=_\w\@="
+
+" TODO - strikeout support
+syn cluster validDSFooterText contains=markdownLinkText,markdownItalic,markdownBold,markdownCode,markdownEscape
+
+" TODO - make sure no blank lines between pragma statements
+syn match dsFooter "^footer:\s*" contains=@validDSFooterText
+
+" TODO - Only true/false allowed on the following
+syn keyword dsPragmaBoolean true false
+syn match dsSlideNumbers "^slidenumbers:\s*" nextgroup=@dsPragmaBoolean
+syn match dsAutoscale "^autoscale:\s*" nextgroup=@dsPragmaBoolean
+syn match dsBuildLists "^build-lists:\s*" nextgroup=@dsPragmaBoolean
+
+
+
 hi def link markdownH1                    htmlH1
 hi def link markdownH2                    htmlH2
 hi def link markdownH3                    htmlH3
@@ -112,6 +147,9 @@ hi def link markdownListMarker            htmlTagName
 hi def link markdownBlockquote            Comment
 hi def link markdownRule                  PreProc
 
+hi def link markdownFootnote              Typedef
+hi def link markdownFootnoteDefinition    Typedef
+
 hi def link markdownLinkText              htmlLink
 hi def link markdownIdDeclaration         Typedef
 hi def link markdownId                    Type
@@ -122,23 +160,31 @@ hi def link markdownUrlDelimiter          htmlTag
 hi def link markdownUrlTitleDelimiter     Delimiter
 
 hi def link markdownItalic                htmlItalic
+hi def link markdownItalicDelimiter       markdownItalic
 hi def link markdownBold                  htmlBold
+hi def link markdownBoldDelimiter         markdownBold
 hi def link markdownBoldItalic            htmlBoldItalic
+hi def link markdownBoldItalicDelimiter   markdownBoldItalic
 hi def link markdownCodeDelimiter         Delimiter
 
 hi def link markdownEscape                Special
+hi def link markdownError                 Error
 
 hi def link dsSlideNumbers                Identifier
 hi def link dsAutoscale                   Identifier
 hi def link dsBuildLists                  Identifier
 hi def link dsFooter                      Identifier
 "" todo - fix me
-hi def link validFooterText               Underlined
+hi def link validDSFooterText             Underlined
+
 hi def link dsPragmaBoolean               Keyword
 
-let b:current_syntax = "deckset"
+hi def link dsFormulaDelimiter            Structure
 
+
+let b:current_syntax = "deckset"
 if main_syntax ==# 'deckset'
   unlet main_syntax
 endif
+
 " vim:set sw=2:
