@@ -105,7 +105,7 @@ syn region dsFormula matchgroup=dsFormulaDelimiter start="\$\$" end="\$\$" keepe
 syn region dsFormula matchgroup=dsFormulaDelimiter start="^\s*\$\$$" end="^\s*\$\$\ze\s*$" keepend contains=@dsFormulaHighlight
 
 syn match markdownFootnote "\[^[^\]]\+\]"
-syn match markdownFootnoteDefinition "^\[^[^\]]\+\]:"
+syn region markdownFootnoteDefinition matchgroup=footnoteDeclDelim start="^\[^[^\]]\+\]:*" end=".*$" 
 
 if main_syntax ==# 'deckset'
   for s:type in g:markdown_fenced_languages
@@ -149,8 +149,10 @@ hi def link markdownListMarker            htmlTagName
 hi def link markdownBlockquote            Comment
 hi def link markdownRule                  PreProc
 
-hi def link markdownFootnote              Typedef
-hi def link markdownFootnoteDefinition    Typedef
+hi def link markdownFootnote              Operator
+hi def link markdownFootnoteDefinition    Comment
+hi def link footnoteDeclDelim             Operator
+
 
 hi def link markdownLinkText              htmlLink
 hi def link markdownIdDeclaration         Typedef
