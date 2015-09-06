@@ -1,6 +1,8 @@
-noremap <silent> <buffer> <leader>R :call UpdateDecksetPreview()<CR>
+noremap <silent> <buffer> <leader>R :call s:UpdateDecksetPreview()<CR>
+command! -nargs=0 -bar DecksetUpdate call s:UpdateDecksetPreview()
 
 let s:path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
+
 
 " Pause on CursorHold before update, in milliseconds
 if !exists('g:DecksetPreviewPauseTime')
@@ -12,7 +14,7 @@ if !exists('g:DecksetAutosave')
   let g:DecksetAutosave = 1
 endif
 
-function! UpdateDecksetPreview()
+function! s:UpdateDecksetPreview()
     " todo - should we check if it's a deckset file as detected?
     if (!g:DecksetRequireGUI || has("gui_running")) && g:IsDecksetRunning == 1 
       if &modified && g:DecksetAutosave
@@ -38,6 +40,6 @@ augroup Deckset
     " down on performance issues for non-deckset editing
    " adjust me for CursorHold Tweaks
    execute "set updatetime=".g:DecksetPreviewPauseTime
-   autocmd CursorHold,CursorHoldI,BufRead,BufWrite,FocusGained,InsertLeave  * if &ft == "deckset" | call UpdateDecksetPreview() | endif
+   autocmd CursorHold,CursorHoldI,BufRead,BufWrite,FocusGained,InsertLeave  * if &ft == "deckset" | call s:UpdateDecksetPreview() | endif
     
 augroup END
