@@ -37,7 +37,8 @@ for s:type in map(copy(g:markdown_fenced_languages),'matchstr(v:val,"[^=]*$")')
 endfor
 unlet! s:type
 
-exe 'syn include @dsFormulaHighlight'.substitute('tex','\.','','g').' syntax/'.matchstr('tex','[^.]*').'.vim'
+" TeX / LaTeX syntax highlighting in Deckset $$ Formula Blocks
+exe 'syn include @dsFormulaHighlight'.' syntax/tex.vim'
 
 
 syn sync minlines=10
@@ -49,7 +50,7 @@ syn match markdownValid '&\%(#\=\w*;\)\@!'
 syn match markdownLineStart "^[<@]\@!" nextgroup=@markdownBlock,htmlSpecialChar
 
 syn cluster decksetPragma contains=dsFooter,dsSlideNumbers,dsAutoscale,dsBuildLists
-syn cluster markdownBlock contains=markdownH1,markdownH2,markdownH3,markdownH4,markdownH5,markdownH6,markdownBlockquote,markdownListMarker,markdownOrderedListMarker,markdownCodeBlock,markdownRule,dsFormulaBlock
+syn cluster markdownBlock contains=markdownH1,markdownH2,markdownH3,markdownH4,markdownH5,markdownH6,markdownBlockquote,markdownListMarker,markdownOrderedListMarker,markdownCodeBlock,markdownRule
 syn cluster markdownInline contains=markdownLineBreak,markdownLinkText,markdownItalic,markdownBold,markdownCode,markdownEscape,@htmlTop,markdownError
 
 syn match markdownH1 "^.\+\n=\+$" contained contains=@markdownInline,markdownHeadingRule
@@ -100,9 +101,8 @@ syn region markdownCode matchgroup=markdownCodeDelimiter start="`" end="`" keepe
 syn region markdownCode matchgroup=markdownCodeDelimiter start="`` \=" end=" \=``" keepend contains=markdownLineStart
 syn region markdownCode matchgroup=markdownCodeDelimiter start="^\s*```.*$" end="^\s*```\ze\s*$" keepend
 
-syn region dsFormulaBlock matchgroup=dsFormulaDelimiter start="^\s*\$\$.*$" end="^\s*\$\$\ze\s*\n" keepend
-
 syn region dsFormula matchgroup=dsFormulaDelimiter start="\$\$" end="\$\$" keepend contains=markdownLineStart keepend contains=markdownLineStart
+syn region dsFormula matchgroup=dsFormulaDelimiter start="^\s*\$\$$" end="^\s*\$\$\ze\s*$" keepend contains=markdownLineStart keepend contains=markdownLineStart
 
 syn match markdownFootnote "\[^[^\]]\+\]"
 syn match markdownFootnoteDefinition "^\[^[^\]]\+\]:"
@@ -110,12 +110,16 @@ syn match markdownFootnoteDefinition "^\[^[^\]]\+\]:"
 if main_syntax ==# 'deckset'
   for s:type in g:markdown_fenced_languages
     " TODO - highlight specially the language name
-    exe 'syn region markdownHighlight'.substitute(matchstr(s:type,'[^=]*$'),'\..*','','').' matchgroup=markdownCodeDelimiter start="^\s*```\s*'.matchstr(s:type,'[^=]*').'\>.*$" end="^\s*```\ze\s*$" keepend contains=@markdownHighlight'.substitute(matchstr(s:type,'[^=]*$'),'\.','','g')
+    let s:cmd = 'syn region markdownHighlight'.substitute(matchstr(s:type,'[^=]*$'),'\..*','','').' matchgroup=markdownCodeDelimiter start="^\s*```\s*'.matchstr(s:type,'[^=]*').'\>.*$" end="^\s*```\ze\s*$" keepend contains=@markdownHighlight'.substitute(matchstr(s:type,'[^=]*$'),'\.','','g')
+    echom s:cmd
+    exe s:cmd
   endfor
+  unlet! s:cmd
   unlet! s:type
 endif
 
-exe 'syn region dsFormulaHighlight'.substitute(matchstr('tex','[^=]*$'),'\..*','','').' matchgroup=dsFormulaDelimiter start="^\s*\$\$\s*'.matchstr('tex','[^=]*').'\>.*$" end="^\s*\$\$\ze\s*$" keepend contains=@dsFormulaHighlight'.substitute(matchstr('tex','[^=]*$'),'\.','','g')
+" TeX / LaTeX syntax highlighting in Deckset $$ Formula Blocks
+exe 'syn region dsFormulaHighlight'.' matchgroup=dsFormulaDelimiter start="^\s*\$\$\s*$" end="^\s*\$\$\ze\s*$" keepend contains=@dsFormulaHighlight'
 
 syn match markdownEscape "\\[][\\`*_{}()<>#+.!-]"
 syn match markdownError "\w\@<=_\w\@="
