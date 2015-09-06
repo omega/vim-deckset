@@ -1,6 +1,6 @@
 # vim-deckset
 
-_Originally based upon [omega/vim-deckset](https://github.com/omega/vim-deckset) but mostly rewritten__ 
+_Originally based upon [omega/vim-deckset](https://github.com/omega/vim-deckset) but mostly rewritten_ 
 
 [Deckset](http://decksetapp.com) is an OS X application for rendering markdown 
 as presentation.
