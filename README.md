@@ -21,15 +21,15 @@ In order to avoid conflicting with your existing Markdown plugins & syntax
 detectors when you _are not_ running Deckset, the plugin takes a few extra 
 safety steps.
 
-    - It checks both if Deckset is running, and the file you're editing is _open inside of Deckset_.
-    - If these conditions are met, your Vim filetype is set to ‘deckset’. 
-    - Apart from the syntax highlighting files, this plugin should be run out of the `.vim/after` folders, so that it makes sure to pick up and set the ‘deckset’ filetype without it later being overridden by other Markdown detectors (assuming those aren't _also_ loaded in `after`).
+- It checks both if Deckset is running, and the file you're editing is _open inside of Deckset_.
+- If these conditions are met, your Vim filetype is set to ‘deckset’. 
+- Apart from the syntax highlighting files, this plugin should be run out of the `.vim/after` folders, so that it makes sure to pick up and set the ‘deckset’ filetype without it later being overridden by other Markdown detectors (assuming those aren't _also_ loaded in `after`).
     
 In addition, there's an enhanced Vim syntax file based on [jratner/vim-flavored-markdown](https://github.com/jtratner/vim-flavored-markdown), which adds more Deckset awareness on top of Github Flavored Markdown support.
     
 I've seen issues with terminal based Vim acting odd & glitchy when the plugin is activated. As a result, by default I have the plugin set to only execute only when the GUI mode (aka MacVim) is running. If you'd like to change it you can set the following in your `.vimrc` file:
 
-```vimrc
+```vim
 let g:DecksetRequireGUI = 0
 ```
     
