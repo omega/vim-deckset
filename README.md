@@ -2,6 +2,13 @@
 
 _Originally based upon [omega/vim-deckset](https://github.com/omega/vim-deckset) but mostly rewritten_ 
 
+Contents:
+1. [About](#about)
+2. [Installation](#installation)
+3. [Implementation Notes](#implementation-notes)
+
+## About
+
 [Deckset](http://decksetapp.com) is an OS X application for rendering markdown 
 as presentation.
 
@@ -16,6 +23,18 @@ For us [Vim](http://www.vim.org) users, we can do a bit better than
 the default behavior. This Vim plugin will, under the right
 circumstances, update the contents of the preview window 
 __as you move your VIM cursor__ around in the Markdown file.
+
+## Installation
+
+Best way is to use [Pathogen](https://github.com/tpope/vim-pathogen), and simply checkout this git repo under your Pathogen bundle directory (typically `~/.vim/bundle`). If you've set Pathogen up properly it will automatically load at Vim boot.
+
+Otherwise, by hand:
+
+- Copy `vim-deckset/after/ftplugin/deckset.vim` to `~/.vim/after/ftplugin/deckset.vim`
+- Copy `vim-deckset/after/ftdetect/deckset.vim` to `~/.vim/after/ftdetect/deckset.vim`
+- Copy `vim-deckset/syntax/deckset.vim` to `~/.vim/syntax/deckset.vim`
+
+## Implementation Notes
 
 In order to avoid conflicting with your existing Markdown plugins & syntax
 detectors when you _are not_ running Deckset, the plugin takes a few extra 
