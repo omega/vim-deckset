@@ -76,12 +76,12 @@ let g:DecksetRequireGUI = 0
 In order to not totally overload your Vim session by running everytime you
 move through the file, `vim-deckset` updates the preview window on the following conditions:
 
-- CursorHold – In Command mode, if the Cursor hasn't moved in `g:DecksetPreviewPauseTime` milliseconds
-- CursorHoldI - In Insert mode, if the Cursor hasn't moved in `g:DecksetPreviewPauseTime` milliseconds
-- BufRead - The file is read from disk (such as when we first open)
-- BufWrite - When the file is saved
-- FocusGained - The Vim window is brought to the foreground
-- InsertLeave - Insert mode is exited
+- `CursorHold` – In Command mode, if the Cursor hasn't moved in `g:DecksetPreviewPauseTime` milliseconds
+- `CursorHoldI` - In Insert mode, if the Cursor hasn't moved in `g:DecksetPreviewPauseTime` milliseconds
+- `BufRead` - The file is read from disk (such as when we first open)
+- `BufWrite` - When the file is saved
+- `FocusGained` - The Vim window is brought to the foreground
+- `InsertLeave` - Insert mode is exited
 
 The default for `g:DecksetPreviewPauseTime` is 500 milliseconds. You can
 change that by setting a new value (in milliseconds) in your
