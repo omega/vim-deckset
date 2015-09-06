@@ -2,12 +2,6 @@ noremap <silent> <buffer> <leader>R :call UpdateDecksetPreview()<CR>
 
 let s:path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
 
-" Should we only run when a GUI VIM is running (i.e. MacVim)
-" I've seen really odd performance & glitching on CLI VIM
-" when the Deckset support is running
-let g:DecksetRequireGUI = 1
-
-
 function! UpdateDecksetPreview()
     " todo - should we check if it's a deckset file as detected?
     if (g:DecksetRequireGUI && has("gui_running")) && g:IsDecksetRunning == 1 

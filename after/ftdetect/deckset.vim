@@ -1,7 +1,12 @@
 let s:path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
 
+" Should we only run when a GUI VIM is running (i.e. MacVim)
+" I've seen really odd performance & glitching on CLI VIM
+" when the Deckset support is running
+let g:DecksetRequireGUI = 1
+
 function! IsDecksetFile()
-    if has("gui_running")
+    if (g:DecksetRequireGUI && has("gui_running"))
       let l:output = system('osascript '.s:path.'/support/is-deckset-file.js '.shellescape(expand('%:p')))
 
 
