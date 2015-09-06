@@ -101,8 +101,8 @@ syn region markdownCode matchgroup=markdownCodeDelimiter start="`" end="`" keepe
 syn region markdownCode matchgroup=markdownCodeDelimiter start="`` \=" end=" \=``" keepend contains=markdownLineStart
 syn region markdownCode matchgroup=markdownCodeDelimiter start="^\s*```.*$" end="^\s*```\ze\s*$" keepend
 
-syn region dsFormula matchgroup=dsFormulaDelimiter start="\$\$" end="\$\$" keepend contains=markdownLineStart keepend contains=markdownLineStart
-syn region dsFormula matchgroup=dsFormulaDelimiter start="^\s*\$\$$" end="^\s*\$\$\ze\s*$" keepend contains=markdownLineStart keepend contains=markdownLineStart
+syn region dsFormula matchgroup=dsFormulaDelimiter start="\$\$" end="\$\$" keepend contains=@dsFormulaHighlight
+syn region dsFormula matchgroup=dsFormulaDelimiter start="^\s*\$\$$" end="^\s*\$\$\ze\s*$" keepend contains=@dsFormulaHighlight
 
 syn match markdownFootnote "\[^[^\]]\+\]"
 syn match markdownFootnoteDefinition "^\[^[^\]]\+\]:"
@@ -110,9 +110,7 @@ syn match markdownFootnoteDefinition "^\[^[^\]]\+\]:"
 if main_syntax ==# 'deckset'
   for s:type in g:markdown_fenced_languages
     " TODO - highlight specially the language name
-    let s:cmd = 'syn region markdownHighlight'.substitute(matchstr(s:type,'[^=]*$'),'\..*','','').' matchgroup=markdownCodeDelimiter start="^\s*```\s*'.matchstr(s:type,'[^=]*').'\>.*$" end="^\s*```\ze\s*$" keepend contains=@markdownHighlight'.substitute(matchstr(s:type,'[^=]*$'),'\.','','g')
-    echom s:cmd
-    exe s:cmd
+    exe 'syn region markdownHighlight'.substitute(matchstr(s:type,'[^=]*$'),'\..*','','').' matchgroup=markdownCodeDelimiter start="^\s*```\s*'.matchstr(s:type,'[^=]*').'\>.*$" end="^\s*```\ze\s*$" keepend contains=@markdownHighlight'.substitute(matchstr(s:type,'[^=]*$'),'\.','','g')
   endfor
   unlet! s:cmd
   unlet! s:type
