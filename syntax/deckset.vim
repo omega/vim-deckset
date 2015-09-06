@@ -105,7 +105,7 @@ syn region dsFormula matchgroup=dsFormulaDelimiter start="\$\$" end="\$\$" keepe
 syn region dsFormula matchgroup=dsFormulaDelimiter start="^\s*\$\$$" end="^\s*\$\$\ze\s*$" keepend contains=@dsFormulaHighlight
 
 syn match markdownFootnote "\[^[^\]]\+\]"
-syn region markdownFootnoteDefinition matchgroup=footnoteDeclDelim start="^\[^[^\]]\+\]:*" end=".*$" 
+syn region markdownFootnoteDef matchgroup=footnoteDelimiter start="^\[^[^\]]\+\]:*" end=".*$" keepend oneline contains=@markdownInline,contained
 
 if main_syntax ==# 'deckset'
   for s:type in g:markdown_fenced_languages
@@ -121,6 +121,8 @@ exe 'syn region dsFormulaHighlight'.' matchgroup=dsFormulaDelimiter start="^\s*\
 
 syn match markdownEscape "\\[][\\`*_{}()<>#+.!-]"
 syn match markdownError "\w\@<=_\w\@="
+
+syn region speakerNoteDef matchgroup=speakersNoteDelimiter start="^\^.*" end=".*$" keepend oneline contains=@markdownInline,contained
 
 " TODO - strikeout support
 syn cluster validDSFooterText contains=markdownLinkText,markdownItalic,markdownBold,markdownCode,markdownEscape
@@ -150,8 +152,8 @@ hi def link markdownBlockquote            Comment
 hi def link markdownRule                  PreProc
 
 hi def link markdownFootnote              Operator
-hi def link markdownFootnoteDefinition    Comment
-hi def link footnoteDeclDelim             Operator
+hi def link footnoteDelimiter             Underlined
+hi def link speakersNoteDelimiter         Error
 
 
 hi def link markdownLinkText              htmlLink
