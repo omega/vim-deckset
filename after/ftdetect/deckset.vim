@@ -16,7 +16,7 @@ function! IsDecksetFile()
 			if v:shell_error == 1
         " So we only skim the app runthrough once per vim session
         " Many markdown implementations want 4 space tabs
-				set filetype=deckset sw=4 ts=4
+				set filetype=deckset sw=4 ts=4 backupcopy=yes
         let g:IsDecksetRunning = 1
         let g:IsDecksetOpenFile = 1
       elseif v:shell_error == 0
