@@ -2,10 +2,20 @@ noremap <silent> <buffer> <leader>R :call UpdateDecksetPreview()<CR>
 
 let s:path = fnamemodify(resolve(expand('<sfile>:p')), ':h:h')
 
+" Pause on CursorHold before update, in milliseconds
+if !exists('g:DecksetPreviewPauseTime')
+  let g:DecksetPreviewPauseTime = 500
+endif
+
+" Automatically save on update if buffer modified?
+if !exists('g:DecksetAutosave')
+  let g:DecksetAutosave = 1
+endif
+
 function! UpdateDecksetPreview()
     " todo - should we check if it's a deckset file as detected?
-    if (g:DecksetRequireGUI && has("gui_running")) && g:IsDecksetRunning == 1 
-      if &modified
+    if (!g:DecksetRequireGUI || has("gui_running")) && g:IsDecksetRunning == 1 
+      if &modified && g:DecksetAutosave
           " Should save?
           write
       endif
@@ -26,5 +36,8 @@ augroup Deckset
     autocmd!
     " TODO - detect if this file is even open in deckset to cut 
     " down on performance issues for non-deckset editing
-    autocmd BufRead,CursorMoved,InsertLeave * if &ft == "deckset" | call UpdateDecksetPreview() | endif
+   " adjust me for CursorHold Tweaks
+   execute "set updatetime=".g:DecksetPreviewPauseTime
+   autocmd CursorHold,CursorHoldI,BufRead,BufWrite,FocusGained,InsertLeave  * if &ft == "deckset" | call UpdateDecksetPreview() | endif
+    
 augroup END
